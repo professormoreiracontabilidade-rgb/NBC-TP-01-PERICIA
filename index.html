@@ -18,13 +18,13 @@ button:active{transform:scale(.97)}
 .center{display:flex;align-items:center;justify-content:center;gap:10px}
 .counter{font-weight:800;font-size:18px;min-width:58px;text-align:center}
 .restart{font-size:15px;padding:0 14px;background:#c62828}
-@media (max-width:380px){.app{padding-left:6px;padding-right:6px}.bar{grid-template-columns:50px 1fr 50px}.restart{font-size:14px;padding:0 10px}}
+@media(max-width:380px){.app{padding-left:6px;padding-right:6px}.bar{grid-template-columns:50px 1fr 50px}.restart{font-size:14px;padding:0 10px}}
 </style>
 </head>
 <body>
 <main class="app" aria-label="Carrossel NBC TP 01 R2">
   <section class="stage" id="stage">
-    <img id="slide" src="imagens/01.webp" alt="Slide 1 de 20" draggable="false" decoding="async" fetchpriority="high">
+    <img id="slide" src="01.webp" alt="Slide 1 de 20" draggable="false" decoding="async" fetchpriority="high">
   </section>
   <nav class="bar" aria-label="Controles do carrossel">
     <button id="prev" aria-label="Imagem anterior">←</button>
@@ -36,34 +36,57 @@ button:active{transform:scale(.97)}
   </nav>
 </main>
 <script>
-(()=> {
-  const total=20, img=document.getElementById('slide'), counter=document.getElementById('counter');
+(()=>{
+  const total=20;
+  const img=document.getElementById('slide');
+  const counter=document.getElementById('counter');
   const stage=document.getElementById('stage');
-  let current=1, startX=0, startY=0;
-  const path=n=>`imagens/${String(n).padStart(2,'0')}.webp`;
-  function preload(n){ if(n>=1&&n<=total){ const p=new Image(); p.src=path(n); } }
+  let current=1,startX=0,startY=0;
+
+  // As imagens estão na MESMA pasta do index.html.
+  const path=n=>`${String(n).padStart(2,'0')}.webp`;
+
+  function preload(n){
+    if(n>=1 && n<=total){
+      const p=new Image();
+      p.src=path(n);
+    }
+  }
+
   function show(n){
     current=((n-1+total)%total)+1;
     img.src=path(current);
     img.alt=`Slide ${current} de ${total}`;
     counter.textContent=`${current} / ${total}`;
-    preload(current+1); preload(current-1);
+    preload(current+1);
+    preload(current-1);
   }
+
   document.getElementById('prev').onclick=()=>show(current-1);
   document.getElementById('next').onclick=()=>show(current+1);
   document.getElementById('restart').onclick=()=>show(1);
+
   addEventListener('keydown',e=>{
     if(e.key==='ArrowLeft') show(current-1);
     if(e.key==='ArrowRight') show(current+1);
     if(e.key==='Home') show(1);
   });
+
   stage.addEventListener('touchstart',e=>{
-    const t=e.changedTouches[0]; startX=t.clientX; startY=t.clientY;
+    const t=e.changedTouches[0];
+    startX=t.clientX;
+    startY=t.clientY;
   },{passive:true});
+
   stage.addEventListener('touchend',e=>{
-    const t=e.changedTouches[0], dx=t.clientX-startX, dy=t.clientY-startY;
-    if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.2) show(current+(dx<0?1:-1));
+    const t=e.changedTouches[0];
+    const dx=t.clientX-startX;
+    const dy=t.clientY-startY;
+    if(Math.abs(dx)>55 && Math.abs(dx)>Math.abs(dy)*1.2){
+      show(current+(dx<0?1:-1));
+    }
   },{passive:true});
+
   preload(2);
 })();
 </script>
